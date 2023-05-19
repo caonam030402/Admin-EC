@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const plugin = require('tailwindcss/plugin')
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  corePlugins: {
-    container: false
-  },
   theme: {
     extend: {
       colors: {
-        orange: '#ee4d2d'
+        primaryColor: '#ee4d2d',
+        secondaryYellow: '#F5F5F5'
       }
     }
   },
@@ -24,7 +23,6 @@ module.exports = {
           paddingRight: theme('spacing.4')
         }
       })
-    }),
-    require('@tailwindcss/line-clamp')
+    })
   ]
 }
