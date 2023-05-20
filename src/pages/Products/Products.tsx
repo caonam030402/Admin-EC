@@ -3,6 +3,7 @@ import { MdKeyboardArrowDown } from 'react-icons/md'
 import { RiAddFill } from 'react-icons/ri'
 import { TbDots } from 'react-icons/tb'
 import { productApi } from 'src/apis/product.api'
+import Pagination from 'src/components/Pagination'
 import Popover from 'src/components/Popover'
 import ProductRating from 'src/components/ProductRating/ProductRating'
 import useQueryConfig from 'src/hooks/useQueryConfig'
@@ -35,11 +36,11 @@ export default function Products() {
               <div>
                 <ul className='z-30 w-[200px] border shadow-sm'>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Điện Thoại</div>
+                    <div>Điện thoại</div>
                     <MdKeyboardArrowDown />
                   </button>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Đồng Hồ</div>
+                    <div>Đồng hồ</div>
                     <MdKeyboardArrowDown />
                   </button>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
@@ -64,44 +65,19 @@ export default function Products() {
               <div>
                 <ul className='z-30 w-[200px] border shadow-sm'>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Điện Thoại</div>
+                    <div>Mới nhất</div>
                     <MdKeyboardArrowDown />
                   </button>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Đồng Hồ</div>
+                    <div>Bán chạy</div>
                     <MdKeyboardArrowDown />
                   </button>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Áo thun</div>
-                    <MdKeyboardArrowDown />
-                  </button>
-                </ul>
-              </div>
-            }
-          >
-            <button className='flex w-[200px] items-center justify-between rounded-md border bg-white px-3 py-2 hover:rounded-bl-none hover:rounded-br-none'>
-              <div>Giá</div>
-              <MdKeyboardArrowDown />
-            </button>
-          </Popover>
-          <Popover
-            classNameArrow=''
-            duration={0}
-            offsetTop={0}
-            className='flex items-center'
-            renderPopover={
-              <div>
-                <ul className='z-30 w-[200px] border shadow-sm'>
-                  <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Điện Thoại</div>
+                    <div>Giá cao đến thấp</div>
                     <MdKeyboardArrowDown />
                   </button>
                   <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Đồng Hồ</div>
-                    <MdKeyboardArrowDown />
-                  </button>
-                  <button className='flex w-full items-center justify-between bg-white px-3 py-2'>
-                    <div>Áo thun</div>
+                    <div>Giá thấp đến cao</div>
                     <MdKeyboardArrowDown />
                   </button>
                 </ul>
@@ -133,7 +109,7 @@ export default function Products() {
           {productsData?.data.data.products.map((item, index) => (
             <tr key={index} className=' rounded-md border-b bg-white'>
               <th className=' flex items-center px-6 py-4 text-gray-900'>
-                <img className='mr-3 h-12 w-12 flex-shrink-0 rounded-md border object-cover' src={item.image} alt='' />
+                <img className='mr-3 h-10 w-10 flex-shrink-0 rounded-md border object-cover' src={item.image} alt='' />
                 <div className=' w-[200px] flex-1 truncate'>{item.name}</div>
               </th>
               <td className='px-6 py-4'>₫{formatCurrency(item.price)}</td>
@@ -164,6 +140,11 @@ export default function Products() {
           ))}
         </tbody>
       </table>
+      <div>
+        {productsData && (
+          <Pagination pageSize={productsData?.data.data.pagination.page_size} queryConfig={queryConfig} />
+        )}
+      </div>
     </div>
   )
 }
