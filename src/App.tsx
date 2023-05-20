@@ -1,4 +1,3 @@
-import SideMemu from './components/SideMemu'
 import useRouteElements from './useRouteElements'
 
 function App() {
