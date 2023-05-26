@@ -20,7 +20,7 @@ export default function Pagination({ queryConfig, pageSize }: Props) {
       if (!dotBefore) {
         dotBefore = true
         return (
-          <span className='mx-3 ' key={index}>
+          <span className='mx-2 ' key={index}>
             ...
           </span>
         )
@@ -31,7 +31,7 @@ export default function Pagination({ queryConfig, pageSize }: Props) {
       if (!dotAfter) {
         dotAfter = true
         return (
-          <span className='mx-3 ' key={index}>
+          <span className='mx-2 ' key={index}>
             ...
           </span>
         )
@@ -59,7 +59,7 @@ export default function Pagination({ queryConfig, pageSize }: Props) {
               pathname: path.products,
               search: createSearchParams({ ...queryConfig, page: pageNumber.toString() }).toString()
             }}
-            className={classNames('mx-3 flex items-center rounded-sm px-4 py-2 text-gray-500', {
+            className={classNames('mx-2 flex items-center rounded-sm px-4 py-2 text-gray-500', {
               'bg-primaryColor text-white shadow-sm': pageNumber === page,
               'bg-transparent': pageNumber !== page
             })}
@@ -71,7 +71,7 @@ export default function Pagination({ queryConfig, pageSize }: Props) {
       })
   }
   return (
-    <div className='mt-7 flex items-center justify-center text-sm text-gray-500'>
+    <div className=' flex items-center justify-center text-sm text-gray-500'>
       {page === 1 ? (
         <button className='cursor-not-allowed opacity-40'>
           <MdOutlineArrowBackIos className='text-lg' />
@@ -82,7 +82,6 @@ export default function Pagination({ queryConfig, pageSize }: Props) {
             pathname: path.products,
             search: createSearchParams({ ...queryConfig, page: (page - 1).toString() }).toString()
           }}
-          className=''
         >
           <MdOutlineArrowBackIos className='text-lg' />
         </Link>
