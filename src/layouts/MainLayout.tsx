@@ -1,3 +1,4 @@
+import Footer from 'src/components/Footer/Footer'
 import Header from 'src/components/Header/Header'
 import SideMemu from 'src/components/SideMenu/SideMenu'
 
@@ -14,6 +15,7 @@ export default function MainLayout({ children }: Props) {
       <div className='col-span-10'>
         <Header />
         <div>{children}</div>
+        <Footer />
       </div>
     </div>
   )

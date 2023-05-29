@@ -1,9 +1,11 @@
 import classNames from 'classnames'
-import { RegisterOptions, UseFormRegister } from 'react-hook-form'
+import { RegisterOptions, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { IoImageOutline } from 'react-icons/io5'
 import { config } from 'src/constants/config'
 import { toast } from 'react-toastify'
-import { useMemo, useRef, useState } from 'react'
+import { useContext, useMemo, useRef, useState } from 'react'
+import { AppContext } from 'src/Contexts/Contexts'
+import { ProductSchema } from 'src/utils/rules'
 
 interface Props {
   onChange?: (file: File) => void
@@ -15,6 +17,7 @@ interface Props {
   rules?: RegisterOptions
   name: string
   id: string
+  setValue: UseFormSetValue<ProductSchema>
 }
 
 export default function UploadImage({
@@ -25,6 +28,7 @@ export default function UploadImage({
   name,
   id,
   register,
+  setValue,
   rules,
   ...rest
 }: Props) {
@@ -36,9 +40,11 @@ export default function UploadImage({
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileFromLocal = event.target.files?.[0]
+    console.log(fileFromLocal)
     if ((fileFromLocal && fileFromLocal.size >= config.maxSizeUploadImages) || !fileFromLocal?.type.includes('image')) {
       toast.error('Ảnh phải bé hơn 5MB')
     } else {
+      setValue(`images.${Number(id)}`, fileFromLocal)
       onChange && onChange(fileFromLocal)
       setFile(fileFromLocal)
     }
@@ -48,12 +54,9 @@ export default function UploadImage({
     <div className='flex w-full items-center justify-center'>
       <label
         htmlFor={id}
-        className={classNames(
-          `${height} flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100`,
-          {
-            'bg-primaryColor/25': messageError
-          }
-        )}
+        className={`${height} ${
+          messageError && 'border-primaryColorx bg-primaryColor/20'
+        } flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100`}
       >
         {previewImage ? (
           <img className='h-full w-full rounded-md object-cover' src={previewImage} alt='' />
@@ -72,7 +75,7 @@ export default function UploadImage({
         )}
         <input
           {...rest}
-          {...register(name, rules)}
+          {...register(`images[${name}]`, rules)}
           onChange={onFileChange}
           id={id}
           type='file'

@@ -2,6 +2,7 @@ import { useRoutes } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
 import Home from './pages/Home/Home'
 import Products from './pages/Products/Products'
+import CreateProduct from './pages/CreateProduct/CreateProduct'
 
 export default function useRouteElements() {
   const routeElements = useRoutes([
@@ -19,6 +20,14 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <Products />
+        </MainLayout>
+      )
+    },
+    {
+      path: '/product/manage',
+      element: (
+        <MainLayout>
+          <CreateProduct />
         </MainLayout>
       )
     }
