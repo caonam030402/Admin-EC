@@ -17,6 +17,8 @@ import { sortBy } from 'src/constants/product'
 import { Category } from 'src/types/categogy.type'
 import Skeleton from 'src/components/SkeletonPost/Skeleton'
 import { toast } from 'react-toastify'
+import Modal from 'src/components/Modal/Modal'
+import { useState } from 'react'
 
 type SortByType = 'price' | 'createdAt' | 'view' | 'sold'
 type OrderType = 'asc' | 'desc'
@@ -40,6 +42,7 @@ const sortByData: sortByDataType[] = [
 ]
 
 export default function Products() {
+  const [isOpenModal, setIsOpenModal] = useState(false)
   const queryConfig = useQueryConfig()
   const { sort_by = sortBy.view, order, category } = queryConfig
   const navigate = useNavigate()
@@ -91,7 +94,7 @@ export default function Products() {
   }
 
   const handleDeleteProduct = (id: string) => {
-    console.log(id)
+    setIsOpenModal(false)
     deleteProductMutation.mutate(id, {
       onSuccess: () => {
         refetch()
@@ -126,7 +129,7 @@ export default function Products() {
     if (typeof matchingSort === 'object') {
       result = matchingSort.name
     } else {
-      result = 'Tất cả danh mục'
+      result = 'Bộ lọc'
     }
 
     return <div>{result}</div>
@@ -150,7 +153,12 @@ export default function Products() {
     return <div>{result}</div>
   }
 
+  const handleOpenModal = () => {
+    setIsOpenModal(true)
+  }
+
   const product = productsData?.data.data
+  console.log(product)
   return (
     <div className='relative mt-3 overflow-x-auto px-8'>
       <div className='mb-4 flex justify-between'>
@@ -275,10 +283,7 @@ export default function Products() {
                       <div>
                         <ul className='flex flex-col rounded-md border bg-white shadow-md'>
                           <button className='px-4 py-2 hover:text-primaryColor'>Sửa Sản Phẩm</button>
-                          <button
-                            onClick={() => handleDeleteProduct(item._id)}
-                            className='px-4 py-2 hover:text-primaryColor'
-                          >
+                          <button onClick={handleOpenModal} className='px-4 py-2 hover:text-primaryColor'>
                             Xóa Sản Phẩm
                           </button>
                         </ul>
@@ -287,6 +292,12 @@ export default function Products() {
                   >
                     <TbDots className='text-xl' />
                   </Popover>
+                  <Modal
+                    setIsOpenModal={setIsOpenModal}
+                    isOpenModal={isOpenModal}
+                    message='Bạn có muốn xóa sản phẩm không ?'
+                    handleClick={() => handleDeleteProduct(item._id)}
+                  />
                 </td>
               </tr>
             ))}

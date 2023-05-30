@@ -5,6 +5,7 @@ import { IoBagRemoveOutline } from 'react-icons/io5'
 import { CgMenuRight } from 'react-icons/cg'
 import { FiUser } from 'react-icons/fi'
 import classNames from 'classnames'
+import Modal from 'src/components/Modal/Modal'
 
 const dataSale = [
   {
