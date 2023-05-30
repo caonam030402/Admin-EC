@@ -17,6 +17,7 @@ interface Props {
   rules?: RegisterOptions
   name: string
   id: string
+  resetImage?: boolean
   setValue: UseFormSetValue<ProductSchema>
 }
 
@@ -30,17 +31,21 @@ export default function UploadImage({
   register,
   setValue,
   rules,
+  resetImage,
   ...rest
 }: Props) {
   const [file, setFile] = useState<File>()
 
   const previewImage = useMemo(() => {
-    return file ? URL.createObjectURL(file) : ''
-  }, [file])
+    if (resetImage) {
+      setFile(undefined)
+    } else {
+      return file ? URL.createObjectURL(file) : ''
+    }
+  }, [file, resetImage])
 
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileFromLocal = event.target.files?.[0]
-    console.log(fileFromLocal)
     if ((fileFromLocal && fileFromLocal.size >= config.maxSizeUploadImages) || !fileFromLocal?.type.includes('image')) {
       toast.error('Ảnh phải bé hơn 5MB')
     } else {

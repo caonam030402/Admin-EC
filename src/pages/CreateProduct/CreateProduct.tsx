@@ -9,25 +9,24 @@ import { InputNumber } from 'src/components/InputNumber/InputNumber'
 import { categoryApi } from 'src/apis/category.api'
 import { useContext, useEffect, useState } from 'react'
 import { AppContext } from 'src/Contexts/Contexts'
+import { toast } from 'react-toastify'
 
 export default function CreateProduct() {
+  const { images, setImages } = useContext(AppContext)
+  const [errorMessageImage, setErrorMessageImage] = useState<string | undefined>()
+  const [isClick, setIsClick] = useState<boolean>(false)
+  const [resetInputImage, setResetInputImage] = useState<boolean>(false)
+
   const {
     handleSubmit,
     control,
     register,
     setValue,
-
+    reset,
     formState: { errors }
   } = useForm<ProductSchema>({
-    resolver: yupResolver(productSchema),
-    defaultValues: {
-      // Add this line if "images" field is not set initially
-    }
+    resolver: yupResolver(productSchema)
   })
-
-  const { images, setImages } = useContext(AppContext)
-  const [errorMessageImage, setErrorMessageImage] = useState<string | undefined>()
-  const [isClick, setIsClick] = useState(false)
 
   useEffect(() => {
     if (isClick) {
@@ -46,16 +45,15 @@ export default function CreateProduct() {
 
   const onSubmit = handleSubmit((data) => {
     if (typeof errorMessageImage === 'string') {
-      return undefined
+      return
+    } else {
+      addProductMutation.mutate(data, {
+        onSuccess: () => {
+          toast.success('Thêm thành công')
+          handleResetForm()
+        }
+      })
     }
-
-    // uploadImageMutation.mutate(images[1])
-
-    addProductMutation.mutate(data, {
-      onSuccess: () => {
-        console.log(data)
-      }
-    })
   })
 
   const { data: categoryData } = useQuery({
@@ -70,7 +68,22 @@ export default function CreateProduct() {
   }
 
   const handleOnchange = (file: File) => {
+    setResetInputImage(false)
     setImages((prev) => [...prev, file])
+  }
+
+  const handleResetForm = () => {
+    setImages([])
+    setResetInputImage(true)
+    reset({
+      images: [],
+      category: 'Chọn danh mục',
+      description: '',
+      price: '',
+      quantity: '',
+      price_before_discount: '',
+      name: ''
+    })
   }
 
   return (
@@ -104,7 +117,13 @@ export default function CreateProduct() {
               control={control}
               name='quantity'
               render={({ field }) => (
-                <InputNumber errorMessage={errors.quantity?.message} placeholder='Số lượng' onChange={field.onChange}>
+                <InputNumber
+                  value={field.value}
+                  ref={field.ref}
+                  errorMessage={errors.quantity?.message}
+                  placeholder='Số lượng'
+                  onChange={field.onChange}
+                >
                   Số lượng sảng phẩm
                 </InputNumber>
               )}
@@ -128,7 +147,13 @@ export default function CreateProduct() {
               control={control}
               name='price'
               render={({ field }) => (
-                <InputNumber errorMessage={errors.price?.message} placeholder='0đ' onChange={field.onChange}>
+                <InputNumber
+                  value={field.value}
+                  ref={field.ref}
+                  errorMessage={errors.price?.message}
+                  placeholder='0đ'
+                  onChange={field.onChange}
+                >
                   Giá
                 </InputNumber>
               )}
@@ -143,6 +168,8 @@ export default function CreateProduct() {
                   errorMessage={errors.price_before_discount?.message}
                   placeholder='0đ'
                   onChange={field.onChange}
+                  value={field.value}
+                  ref={field.ref}
                 >
                   Giá trước khuyến mãi
                 </InputNumber>
@@ -157,6 +184,7 @@ export default function CreateProduct() {
           <div className='grid gap-4'>
             <div>
               <UploadImage
+                resetImage={resetInputImage}
                 messageError={errorMessageImage}
                 setValue={setValue}
                 onChange={handleOnchange}
@@ -172,6 +200,7 @@ export default function CreateProduct() {
                 .fill(0)
                 .map((_, index) => (
                   <UploadImage
+                    resetImage={resetInputImage}
                     onChange={handleOnchange}
                     messageError={errorMessageImage}
                     setValue={setValue}
@@ -194,7 +223,11 @@ export default function CreateProduct() {
           >
             Thêm sản phẩm
           </button>
-          <button className='col-span-6 rounded-sm border border-primaryColor px-3 py-2 text-primaryColor'>
+          <button
+            type='button'
+            onClick={handleResetForm}
+            className='col-span-6 rounded-sm border border-primaryColor px-3 py-2 text-primaryColor'
+          >
             Nhập lại thông tin
           </button>
         </div>

@@ -21,27 +21,20 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
   },
   ref
 ) {
-  const [localValue, setLocalValue] = useState<string>(value as string)
+  // const [localValue, setLocalValue] = useState<string>(value as string)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     const regaxNumber = /^[0-9]+$/
     if (regaxNumber.test(value) || value === '') {
       onChange && onChange(event)
-      setLocalValue(value)
+      // setLocalValue(value)
     }
   }
 
   return (
     <div>
       {children && <h1 className={classNameTitle}>{children}</h1>}
-      <input
-        {...rest}
-        value={value || localValue}
-        onChange={handleChange}
-        ref={ref}
-        className={classNameInput}
-        type='text'
-      />
+      <input {...rest} value={value} onChange={handleChange} ref={ref} className={classNameInput} type='text' />
       <p className={classNameError}>{errorMessage}</p>
     </div>
   )

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import classNames from 'classnames'
 import { MdKeyboardArrowDown } from 'react-icons/md'
 import { RiAddFill } from 'react-icons/ri'
@@ -16,6 +16,7 @@ import { formatCurrency, formatNumberToSocialStyle } from 'src/utils/utils'
 import { sortBy } from 'src/constants/product'
 import { Category } from 'src/types/categogy.type'
 import Skeleton from 'src/components/SkeletonPost/Skeleton'
+import { toast } from 'react-toastify'
 
 type SortByType = 'price' | 'createdAt' | 'view' | 'sold'
 type OrderType = 'asc' | 'desc'
@@ -42,7 +43,11 @@ export default function Products() {
   const queryConfig = useQueryConfig()
   const { sort_by = sortBy.view, order, category } = queryConfig
   const navigate = useNavigate()
-  const { data: productsData, isLoading } = useQuery({
+  const {
+    data: productsData,
+    isLoading,
+    refetch
+  } = useQuery({
     queryKey: ['products', queryConfig],
     queryFn: () => {
       return productApi.getProducts(queryConfig as ProductListConfig)
@@ -76,10 +81,22 @@ export default function Products() {
     }
   }
 
+  const deleteProductMutation = useMutation({ mutationFn: (id: string) => productApi.deleteProduct(id) })
+
   const handleSortCategory = (category: Category) => {
     navigate({
       pathname: path.products,
       search: createSearchParams({ ...queryConfig, category: category._id }).toString()
+    })
+  }
+
+  const handleDeleteProduct = (id: string) => {
+    console.log(id)
+    deleteProductMutation.mutate(id, {
+      onSuccess: () => {
+        refetch()
+        toast.success('Xóa thành công')
+      }
     })
   }
 
@@ -258,7 +275,12 @@ export default function Products() {
                       <div>
                         <ul className='flex flex-col rounded-md border bg-white shadow-md'>
                           <button className='px-4 py-2 hover:text-primaryColor'>Sửa Sản Phẩm</button>
-                          <button className='px-4 py-2 hover:text-primaryColor'>Xóa Sản Phẩm</button>
+                          <button
+                            onClick={() => handleDeleteProduct(item._id)}
+                            className='px-4 py-2 hover:text-primaryColor'
+                          >
+                            Xóa Sản Phẩm
+                          </button>
                         </ul>
                       </div>
                     }

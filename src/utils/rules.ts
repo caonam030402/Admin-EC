@@ -1,13 +1,9 @@
 import * as yup from 'yup'
 
-const images = Array(5)
-  .fill(0)
-  .map((_, index) => {
-    const messageError = (index: number) => `Ảnh ${index} là bắt buộc`
-    const key = `images[${index}]`
-    const validationSchema = yup.mixed().required(messageError(index))
-    return { [key]: validationSchema }
-  })
+// function checkPrice(this: yup.TestContext<yup.AnyObject>) {
+//   const { price, price_before_discount } = this.parent as { price: string; price_before_discount: string }
+//   if(price )
+// }
 
 export const productSchema = yup.object({
   name: yup

@@ -16,6 +16,9 @@ export const productApi = {
       }
     })
   },
+  deleteProduct(id: string) {
+    return http.delete(`${URL}/delete-product/${id}`)
+  },
   upLoadImageProducts(body: FormData) {
     return http.post<SuccessResponse<string>>('product/upload-image', body, {
       headers: {
