@@ -27,14 +27,20 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
     const regaxNumber = /^[0-9]+$/
     if (regaxNumber.test(value) || value === '') {
       onChange && onChange(event)
-      // setLocalValue(value)
     }
   }
 
   return (
     <div>
       {children && <h1 className={classNameTitle}>{children}</h1>}
-      <input {...rest} value={value} onChange={handleChange} ref={ref} className={classNameInput} type='text' />
+      <input
+        {...rest}
+        value={value === undefined ? '' : value}
+        onChange={handleChange}
+        ref={ref}
+        className={classNameInput}
+        type='text'
+      />
       <p className={classNameError}>{errorMessage}</p>
     </div>
   )

@@ -9,6 +9,11 @@ export const productApi = {
   getProducts(params: ProductListConfig) {
     return http.get<SuccessResponse<ProductList>>(URL, { params })
   },
+
+  getAProduct(id: string) {
+    return http.get<SuccessResponse<Product>>(`${URL}/${id}`)
+  },
+
   addProduct(body: ProductSchema) {
     return http.post<SuccessResponse<Product>>(`${URL}/add-product`, body, {
       headers: {
@@ -25,5 +30,8 @@ export const productApi = {
         'Content-Type': 'multipart/form-data'
       }
     })
+  },
+  updateProduct(body: ProductSchema) {
+    return http.put(`${URL}/update-product`, body)
   }
 }

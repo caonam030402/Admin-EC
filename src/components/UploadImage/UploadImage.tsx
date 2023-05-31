@@ -1,10 +1,8 @@
-import classNames from 'classnames'
 import { RegisterOptions, UseFormRegister, UseFormSetValue } from 'react-hook-form'
 import { IoImageOutline } from 'react-icons/io5'
 import { config } from 'src/constants/config'
 import { toast } from 'react-toastify'
-import { useContext, useMemo, useRef, useState } from 'react'
-import { AppContext } from 'src/Contexts/Contexts'
+import { useMemo, useState } from 'react'
 import { ProductSchema } from 'src/utils/rules'
 
 interface Props {
@@ -19,6 +17,7 @@ interface Props {
   id: string
   resetImage?: boolean
   setValue: UseFormSetValue<ProductSchema>
+  urlImageReviewFromSV?: string[]
 }
 
 export default function UploadImage({
@@ -32,6 +31,7 @@ export default function UploadImage({
   setValue,
   rules,
   resetImage,
+  urlImageReviewFromSV,
   ...rest
 }: Props) {
   const [file, setFile] = useState<File>()
@@ -49,11 +49,17 @@ export default function UploadImage({
     if ((fileFromLocal && fileFromLocal.size >= config.maxSizeUploadImages) || !fileFromLocal?.type.includes('image')) {
       toast.error('Ảnh phải bé hơn 5MB')
     } else {
-      setValue(`images.${Number(id)}`, fileFromLocal)
-      onChange && onChange(fileFromLocal)
-      setFile(fileFromLocal)
+      if (fileFromLocal) {
+        setValue(`images.${Number(id)}`, fileFromLocal)
+        onChange && onChange(fileFromLocal)
+        setFile(fileFromLocal)
+      } else {
+        setFile(undefined)
+      }
     }
   }
+
+  const checkLengthArrayImage = urlImageReviewFromSV && urlImageReviewFromSV?.length > 0
 
   return (
     <div className='flex w-full items-center justify-center'>
@@ -63,8 +69,22 @@ export default function UploadImage({
           messageError && 'border-primaryColorx bg-primaryColor/20'
         } flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white hover:bg-gray-100`}
       >
-        {previewImage ? (
-          <img className='h-full w-full rounded-md object-cover' src={previewImage} alt='' />
+        <input
+          {...rest}
+          {...register(`images[${name}]`, rules)}
+          onChange={onFileChange}
+          id={id}
+          type='file'
+          className='hidden'
+          accept='.jpg,.jpeg,.png'
+        />
+        {previewImage || checkLengthArrayImage ? (
+          <img
+            className='h-full w-full rounded-md object-cover'
+            src={checkLengthArrayImage ? urlImageReviewFromSV[Number(id)] : previewImage}
+            alt=''
+            id={id}
+          />
         ) : (
           <div className='flex flex-col items-center justify-center'>
             <IoImageOutline className={`${!hideText && 'mb-3'} text-3xl text-gray-400`} />
@@ -78,15 +98,6 @@ export default function UploadImage({
             )}
           </div>
         )}
-        <input
-          {...rest}
-          {...register(`images[${name}]`, rules)}
-          onChange={onFileChange}
-          id={id}
-          type='file'
-          className='hidden'
-          accept='.jpg,.jpeg,.png'
-        />
       </label>
     </div>
   )

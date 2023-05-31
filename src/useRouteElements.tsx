@@ -24,7 +24,15 @@ export default function useRouteElements() {
       )
     },
     {
-      path: '/product/manage',
+      path: '/product/manage/:productId',
+      element: (
+        <MainLayout>
+          <CreateProduct />
+        </MainLayout>
+      )
+    },
+    {
+      path: '/product/manage/add-product',
       element: (
         <MainLayout>
           <CreateProduct />

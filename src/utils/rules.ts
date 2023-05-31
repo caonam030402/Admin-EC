@@ -9,7 +9,7 @@ export const productSchema = yup.object({
   name: yup
     .string()
     .required('Nhập tên sản phẩm là bắc buộc')
-    .max(50, 'Độ dài sản phẩm không được quá 50 kí tự')
+    .max(200, 'Độ dài sản phẩm không được quá 50 kí tự')
     .min(10, 'Độ dài tên sản phẩm phải lớn hơn 10 kí tự'),
   quantity: yup
     .string()

@@ -11,14 +11,15 @@ import Popover from 'src/components/Popover'
 import ProductRating from 'src/components/ProductRating/ProductRating'
 import path from 'src/constants/path'
 import useQueryConfig from 'src/hooks/useQueryConfig'
-import { ProductListConfig } from 'src/types/product.type'
-import { formatCurrency, formatNumberToSocialStyle } from 'src/utils/utils'
+import { Product, ProductListConfig } from 'src/types/product.type'
+import { formatCurrency, formatNumberToSocialStyle, generateNameId } from 'src/utils/utils'
 import { sortBy } from 'src/constants/product'
 import { Category } from 'src/types/categogy.type'
 import Skeleton from 'src/components/SkeletonPost/Skeleton'
 import { toast } from 'react-toastify'
 import Modal from 'src/components/Modal/Modal'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
+import { AppContext } from 'src/Contexts/Contexts'
 
 type SortByType = 'price' | 'createdAt' | 'view' | 'sold'
 type OrderType = 'asc' | 'desc'
@@ -46,6 +47,18 @@ export default function Products() {
   const queryConfig = useQueryConfig()
   const { sort_by = sortBy.view, order, category } = queryConfig
   const navigate = useNavigate()
+  const { setProduct, product: Aproduct } = useContext(AppContext)
+  const [idProduct, setIdProduct] = useState('')
+
+  const deleteProductMutation = useMutation({ mutationFn: (id: string) => productApi.deleteProduct(id) })
+
+  const { data: AProductData } = useQuery({
+    queryKey: ['product'],
+    queryFn: () => {
+      return productApi.getAProduct(idProduct)
+    }
+  })
+
   const {
     data: productsData,
     isLoading,
@@ -84,8 +97,6 @@ export default function Products() {
     }
   }
 
-  const deleteProductMutation = useMutation({ mutationFn: (id: string) => productApi.deleteProduct(id) })
-
   const handleSortCategory = (category: Category) => {
     navigate({
       pathname: path.products,
@@ -102,6 +113,14 @@ export default function Products() {
       }
     })
   }
+
+  const handleEditProduct = (id: string) => {
+    console.log(Aproduct)
+    setIdProduct(id)
+    setProduct(AProductData?.data.data)
+    // navigate(path.productManager)
+  }
+  console.log(AProductData)
 
   const isActiveSort = (sortByValue: SortByType | OrderType) => {
     if (order) {
@@ -158,7 +177,7 @@ export default function Products() {
   }
 
   const product = productsData?.data.data
-  console.log(product)
+
   return (
     <div className='relative mt-3 overflow-x-auto px-8'>
       <div className='mb-4 flex justify-between'>
@@ -238,7 +257,7 @@ export default function Products() {
           </Popover>
         </div>
         <Link
-          to={path.productManager}
+          to={path.productManagerAdd}
           className='flex items-center rounded-md border bg-primaryColor px-3 py-2 text-white'
         >
           <RiAddFill className='mr-2 text-lg' />
@@ -282,7 +301,13 @@ export default function Products() {
                     renderPopover={
                       <div>
                         <ul className='flex flex-col rounded-md border bg-white shadow-md'>
-                          <button className='px-4 py-2 hover:text-primaryColor'>Sửa Sản Phẩm</button>
+                          <Link
+                            to={`${path.home}product/manage/${generateNameId({ name: item.name, id: item._id })}`}
+                            onClick={() => handleEditProduct(item._id)}
+                            className='px-4 py-2 hover:text-primaryColor'
+                          >
+                            Sửa Sản Phẩm
+                          </Link>
                           <button onClick={handleOpenModal} className='px-4 py-2 hover:text-primaryColor'>
                             Xóa Sản Phẩm
                           </button>

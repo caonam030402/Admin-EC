@@ -10,12 +10,34 @@ import { categoryApi } from 'src/apis/category.api'
 import { useContext, useEffect, useState } from 'react'
 import { AppContext } from 'src/Contexts/Contexts'
 import { toast } from 'react-toastify'
+import { useParams } from 'react-router-dom'
+import { getIdFromNameId } from 'src/utils/utils'
+import { Product } from 'src/types/product.type'
 
 export default function CreateProduct() {
   const { images, setImages } = useContext(AppContext)
   const [errorMessageImage, setErrorMessageImage] = useState<string | undefined>()
   const [isClick, setIsClick] = useState<boolean>(false)
   const [resetInputImage, setResetInputImage] = useState<boolean>(false)
+  const [urlImageReviewFromSV, setUrlImageReviewFromSV] = useState<string[]>([])
+  const { productId } = useParams()
+
+  const id = productId && getIdFromNameId(productId as string)
+  const addProductMutation = useMutation({ mutationFn: (body: ProductSchema) => productApi.addProduct(body) })
+  const updateProductMutation = useMutation({ mutationFn: (body: ProductSchema) => productApi.updateProduct(body) })
+
+  const { data: productData } = useQuery({
+    queryKey: ['product'],
+    queryFn: () => {
+      if (productId) {
+        return productApi.getAProduct(id as string)
+      } else {
+        return null
+      }
+    }
+  })
+
+  const product = productData?.data.data
 
   const {
     handleSubmit,
@@ -28,8 +50,15 @@ export default function CreateProduct() {
     resolver: yupResolver(productSchema)
   })
 
+  const { data: categoryData } = useQuery({
+    queryKey: ['categoryOption'],
+    queryFn: () => {
+      return categoryApi.getCategories()
+    }
+  })
+
   useEffect(() => {
-    if (isClick) {
+    if (isClick && images) {
       if (images.length < 5) {
         setErrorMessageImage('Vui lòng nhập đủ 6 ảnh')
         return
@@ -38,28 +67,39 @@ export default function CreateProduct() {
         setErrorMessageImage(undefined)
       }
     }
-  }, [images, isClick])
+  }, [images, isClick, urlImageReviewFromSV])
 
-  const addProductMutation = useMutation({ mutationFn: (body: ProductSchema) => productApi.addProduct(body) })
-  // const uploadImageMutation = useMutation({ mutationFn: (body: File) => productApi.upLoadImageProducts(body) })
+  useEffect(() => {
+    if (product !== undefined && productId !== undefined) {
+      setUrlImageReviewFromSV(product.images)
+      setValue('name', product.name)
+      setValue('category', String(product.category?._id))
+      setValue('price_before_discount', String(product.price_before_discount))
+      setValue('price', String(product.price))
+      setValue('description', String(product.description))
+      setValue('quantity', String(product.quantity))
+      setValue('images', product.images)
+    }
+  }, [product, setValue, productId])
 
   const onSubmit = handleSubmit((data) => {
     if (typeof errorMessageImage === 'string') {
       return
     } else {
-      addProductMutation.mutate(data, {
-        onSuccess: () => {
-          toast.success('Thêm thành công')
-          handleResetForm()
-        }
-      })
-    }
-  })
-
-  const { data: categoryData } = useQuery({
-    queryKey: ['categoryOption'],
-    queryFn: () => {
-      return categoryApi.getCategories()
+      product &&
+        productId &&
+        updateProductMutation.mutate(data, {
+          onSuccess: () => {
+            toast.success('Cập nhập sản phẩm thành công')
+          }
+        })
+      !productId &&
+        addProductMutation.mutate(data, {
+          onSuccess: () => {
+            toast.success('Thêm thành công')
+            handleResetForm()
+          }
+        })
     }
   })
 
@@ -69,11 +109,12 @@ export default function CreateProduct() {
 
   const handleOnchange = (file: File) => {
     setResetInputImage(false)
-    setImages((prev) => [...prev, file])
+    setImages((prev) => prev && [...prev, file])
   }
 
+  console.log(images)
   const handleResetForm = () => {
-    setImages([])
+    setImages(null)
     setResetInputImage(true)
     reset({
       images: [],
@@ -184,6 +225,7 @@ export default function CreateProduct() {
           <div className='grid gap-4'>
             <div>
               <UploadImage
+                urlImageReviewFromSV={urlImageReviewFromSV}
                 resetImage={resetInputImage}
                 messageError={errorMessageImage}
                 setValue={setValue}
@@ -200,6 +242,7 @@ export default function CreateProduct() {
                 .fill(0)
                 .map((_, index) => (
                   <UploadImage
+                    urlImageReviewFromSV={urlImageReviewFromSV}
                     resetImage={resetInputImage}
                     onChange={handleOnchange}
                     messageError={errorMessageImage}
@@ -221,7 +264,7 @@ export default function CreateProduct() {
             type='submit'
             className='col-span-6 rounded-sm bg-primaryColor px-3 py-2 text-white'
           >
-            Thêm sản phẩm
+            {productId ? 'Cập nhập ngay' : 'Thêm sản phẩm'}
           </button>
           <button
             type='button'

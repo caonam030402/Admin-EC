@@ -3,7 +3,8 @@ const path = {
   order: '/order',
   customers: '/customers',
   products: '/products',
-  productManager: '/product/manage',
+  productManager: '/product/manage/',
+  productManagerAdd: '/product/manage/add-product',
   signOut: '/signOut'
 } as const
 
