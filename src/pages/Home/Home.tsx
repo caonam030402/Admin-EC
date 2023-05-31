@@ -3,13 +3,17 @@ import { AiOutlineShoppingCart } from 'react-icons/ai'
 import { MdOutlineKeyboardArrowUp } from 'react-icons/md'
 import { IoBagRemoveOutline } from 'react-icons/io5'
 import { CgMenuRight } from 'react-icons/cg'
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
+import 'react-circular-progressbar/dist/styles.css'
 import { FiUser } from 'react-icons/fi'
 import classNames from 'classnames'
 import { useQuery } from '@tanstack/react-query'
 import { dashboardApi } from 'src/apis/dashboard.api'
 import CountUp from 'react-countup'
+import { useState } from 'react'
 
 export default function Home() {
+  const [targetSelling, setTagetSelling] = useState<number>(100)
   const { data: dataQuanlityOverview } = useQuery({
     queryKey: ['quanlity_overview'],
     queryFn: () => {
@@ -17,6 +21,16 @@ export default function Home() {
     }
   })
   const total = dataQuanlityOverview?.data.data
+
+  const { data: dataQuanlitySoldOverTime } = useQuery({
+    queryKey: ['quanlity_sold_overtime'],
+    queryFn: () => {
+      return dashboardApi.getquanlitySoldOverTime()
+    }
+  })
+  const quanlitySoldOverTime = dataQuanlitySoldOverTime?.data.data
+
+  const percentTargetSelling = quanlitySoldOverTime && (quanlitySoldOverTime?.total / targetSelling) * 100
 
   const quanlityOverview = [
     {
@@ -81,15 +95,45 @@ export default function Home() {
           </div>
         ))}
       </div>
-      <div className='mt-10 grid grid-cols-12'>
-        <div className='col-span-4 bg-white p-5'>
+      <div className='mt-10 grid grid-cols-12 gap-4'>
+        <div className='col-span-3 rounded-md bg-white p-6'>
           <div className='flex items-center justify-between'>
-            <div>Tổng doanh thu hôm nay</div>
+            <div className='text-lg font-bold'>Mục Tiêu Hôm Nay</div>
             <div>
               <CgMenuRight />
             </div>
           </div>
-          <div>{/* <CircularProgressbar value={66} text={`${66}%`} />; */}</div>
+          <div>
+            <div className='relative'>
+              <CircularProgressbar
+                className='mx-auto mt-11 w-48'
+                styles={buildStyles({
+                  pathTransitionDuration: 2,
+                  trailColor: '#e8f7f8',
+                  pathColor: '#ee4d2d',
+                  textColor: '#333'
+                })}
+                value={quanlitySoldOverTime ? Number(percentTargetSelling) : 0}
+              ></CircularProgressbar>
+              <CountUp
+                className='absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] text-4xl font-semibold'
+                start={0}
+                separator=','
+                suffix='%'
+                end={Number(percentTargetSelling)}
+                duration={2.75}
+              />
+            </div>
+          </div>
+          <div className='text-center '>
+            <p className='mt-4 text-sm '>
+              Số Lượng Đơn Bán Ra:
+              <p className='text-2xl font-bold text-primaryColor'>
+                {quanlitySoldOverTime ? ` ${quanlitySoldOverTime?.total}/${targetSelling}` : ''}
+              </p>
+            </p>
+            <button className='mt-3 w-1/2 rounded-md bg-primaryColor py-2 text-white'>Đặt lại mục tiêu</button>
+          </div>
         </div>
         <div className='col-span-8'></div>
       </div>

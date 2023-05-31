@@ -1,6 +1,7 @@
 type Total = {
   _id: null | string
   total: number
+  currentDateTime?: string
 }
 
 export interface TotalOverview {

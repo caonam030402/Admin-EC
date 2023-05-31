@@ -7,7 +7,7 @@ interface Props {
   isOpenModal: boolean
 }
 
-export default function Modal({ handleClick, message, isOpenModal, setIsOpenModal }: Props) {
+export default function PopUp({ handleClick, message, isOpenModal, setIsOpenModal }: Props) {
   const handleCloseModal = () => {
     setIsOpenModal(false)
   }

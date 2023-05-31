@@ -11,15 +11,15 @@ import Popover from 'src/components/Popover'
 import ProductRating from 'src/components/ProductRating/ProductRating'
 import path from 'src/constants/path'
 import useQueryConfig from 'src/hooks/useQueryConfig'
-import { Product, ProductListConfig } from 'src/types/product.type'
+import { ProductListConfig } from 'src/types/product.type'
 import { formatCurrency, formatNumberToSocialStyle, generateNameId } from 'src/utils/utils'
 import { sortBy } from 'src/constants/product'
 import { Category } from 'src/types/categogy.type'
 import Skeleton from 'src/components/SkeletonPost/Skeleton'
 import { toast } from 'react-toastify'
-import Modal from 'src/components/Modal/Modal'
 import { useContext, useState } from 'react'
 import { AppContext } from 'src/Contexts/Contexts'
+import PopUp from 'src/components/PopUp/PopUp'
 
 type SortByType = 'price' | 'createdAt' | 'view' | 'sold'
 type OrderType = 'asc' | 'desc'
@@ -120,7 +120,6 @@ export default function Products() {
     setProduct(AProductData?.data.data)
     // navigate(path.productManager)
   }
-  console.log(AProductData)
 
   const isActiveSort = (sortByValue: SortByType | OrderType) => {
     if (order) {
@@ -317,7 +316,7 @@ export default function Products() {
                   >
                     <TbDots className='text-xl' />
                   </Popover>
-                  <Modal
+                  <PopUp
                     setIsOpenModal={setIsOpenModal}
                     isOpenModal={isOpenModal}
                     message='Bạn có muốn xóa sản phẩm không ?'
