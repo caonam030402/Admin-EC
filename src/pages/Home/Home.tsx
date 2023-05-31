@@ -5,49 +5,66 @@ import { IoBagRemoveOutline } from 'react-icons/io5'
 import { CgMenuRight } from 'react-icons/cg'
 import { FiUser } from 'react-icons/fi'
 import classNames from 'classnames'
-import Modal from 'src/components/Modal/Modal'
-
-const dataSale = [
-  {
-    name: 'Tổng tiền đã bán',
-    value: '$53.000',
-    icon: <FaRegMoneyBillAlt />,
-    percent: '8%'
-  },
-  {
-    name: 'Sản phẩm bán',
-    value: '200',
-    icon: <AiOutlineShoppingCart />,
-    percent: '8%'
-  },
-  {
-    name: 'Tổng sản phẩm',
-    value: '400',
-    icon: <IoBagRemoveOutline />,
-    percent: '8%'
-  },
-  {
-    name: 'Tổng người dùng',
-    value: '700',
-    icon: <FiUser />,
-    percent: '8%'
-  }
-]
+import { useQuery } from '@tanstack/react-query'
+import { dashboardApi } from 'src/apis/dashboard.api'
+import CountUp from 'react-countup'
 
 export default function Home() {
+  const { data: dataQuanlityOverview } = useQuery({
+    queryKey: ['quanlity_overview'],
+    queryFn: () => {
+      return dashboardApi.getquanlityOverview()
+    }
+  })
+  const total = dataQuanlityOverview?.data.data
+
+  const quanlityOverview = [
+    {
+      name: 'Tổng tiền đã bán',
+      value: Number(total?.totalAmoutSold.total),
+      icon: <FaRegMoneyBillAlt />,
+      percent: '8%'
+    },
+    {
+      name: 'Sản phẩm bán',
+      value: Number(total?.totalProductSold.total),
+      icon: <AiOutlineShoppingCart />,
+      percent: '8%'
+    },
+    {
+      name: 'Tổng sản phẩm',
+      value: Number(total?.totalProduct.total),
+      icon: <IoBagRemoveOutline />,
+      percent: '8%'
+    },
+    {
+      name: 'Tổng người dùng',
+      value: Number(total?.totalUser.total),
+      icon: <FiUser />,
+      percent: '8%'
+    }
+  ]
+
   return (
     <div className='px-10'>
       <div className='grid grid-cols-12 gap-4'>
-        {dataSale.map((item, index) => (
+        {quanlityOverview.map((item, index) => (
           <div key={index} className='col-span-3 rounded-md bg-white p-4 shadow-sm'>
-            <div className='flex items-center justify-between'>
+            <div className='mb-3 flex items-center justify-between'>
               <div className='text-sm'>{item.name}</div>
               <div className='flex items-center text-green-400'>
                 <MdOutlineKeyboardArrowUp className='text-xl' />
                 <div className=''>{item.percent}</div>
               </div>
             </div>
-            <div className='mt-3 text-2xl font-semibold'>{item.value}</div>
+            <CountUp
+              className='text-2xl font-semibold'
+              start={0}
+              separator=','
+              end={item.value}
+              duration={2.75}
+              suffix={item.name === 'Tổng tiền đã bán' ? '₫' : ''}
+            />
             <div className='flex items-end justify-between'>
               <div className='text-xs'>See all...</div>
               <div
