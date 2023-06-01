@@ -44,4 +44,17 @@ export const productSchema = yup.object({
   category: yup.string().required('chọn category là bắc buộc').notOneOf(['Chọn danh mục'], 'Vui lòng chọn danh mục')
 })
 
+export const targetSchema = yup.object({
+  sellingTarget: yup
+    .string()
+    .required('Nhập mục tiêu là bắt buộc')
+    .test({
+      name: 'is-valid-price',
+      message: 'Vui lòng điền mục tiêu phù hợp',
+      test: (value) => Number(value) !== 0
+    })
+})
+
+export type TargetSchema = yup.InferType<typeof targetSchema>
+
 export type ProductSchema = yup.InferType<typeof productSchema>

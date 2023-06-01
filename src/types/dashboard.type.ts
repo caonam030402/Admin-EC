@@ -1,4 +1,4 @@
-type Total = {
+export type Total = {
   _id: null | string
   total: number
   currentDateTime?: string

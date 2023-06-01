@@ -38,7 +38,9 @@ export const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(functi
         value={value === undefined ? '' : value}
         onChange={handleChange}
         ref={ref}
-        className={classNameInput}
+        className={`${classNameInput} ${
+          errorMessage && 'border border-red-500 bg-red-50 text-red-900 placeholder-red-700'
+        }`}
         type='text'
       />
       <p className={classNameError}>{errorMessage}</p>

@@ -6,20 +6,40 @@ import { CgMenuRight } from 'react-icons/cg'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
 import { FiUser } from 'react-icons/fi'
+import { Controller, useForm } from 'react-hook-form'
 import classNames from 'classnames'
 import { useQuery } from '@tanstack/react-query'
 import { dashboardApi } from 'src/apis/dashboard.api'
 import CountUp from 'react-countup'
 import { useState } from 'react'
+import Modal from 'src/components/Modal/Modal'
+import { InputNumber } from 'src/components/InputNumber/InputNumber'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { TargetSchema, targetSchema } from 'src/utils/rules'
 
 export default function Home() {
-  const [targetSelling, setTagetSelling] = useState<number>(100)
+  const [isTargetSelling, setIsTagetSelling] = useState<number>(100)
+  const [isOpenModal, setIsOpenModal] = useState(false)
   const { data: dataQuanlityOverview } = useQuery({
     queryKey: ['quanlity_overview'],
     queryFn: () => {
       return dashboardApi.getquanlityOverview()
     }
   })
+
+  const {
+    handleSubmit,
+    control,
+    register,
+    setValue,
+    reset,
+    formState: { errors }
+  } = useForm<TargetSchema>({
+    resolver: yupResolver(targetSchema)
+  })
+
+  console.log(errors.sellingTarget?.message)
+
   const total = dataQuanlityOverview?.data.data
 
   const { data: dataQuanlitySoldOverTime } = useQuery({
@@ -30,7 +50,11 @@ export default function Home() {
   })
   const quanlitySoldOverTime = dataQuanlitySoldOverTime?.data.data
 
-  const percentTargetSelling = quanlitySoldOverTime && (quanlitySoldOverTime?.total / targetSelling) * 100
+  const handleOpenModal = () => {
+    setIsOpenModal(true)
+  }
+
+  const percentTargetSelling = quanlitySoldOverTime && (quanlitySoldOverTime?.total / isTargetSelling) * 100
 
   const quanlityOverview = [
     {
@@ -58,6 +82,12 @@ export default function Home() {
       percent: '8%'
     }
   ]
+
+  const onSubmit = handleSubmit((data) => {
+    setIsTagetSelling(Number(data.sellingTarget))
+    setIsOpenModal(false)
+    reset()
+  })
 
   return (
     <div className='px-10'>
@@ -126,13 +156,41 @@ export default function Home() {
             </div>
           </div>
           <div className='text-center '>
-            <p className='mt-4 text-sm '>
+            <div className='mt-4 text-sm '>
               Số Lượng Đơn Bán Ra:
               <p className='text-2xl font-bold text-primaryColor'>
-                {quanlitySoldOverTime ? ` ${quanlitySoldOverTime?.total}/${targetSelling}` : ''}
+                {quanlitySoldOverTime ? ` ${quanlitySoldOverTime?.total}/${isTargetSelling}` : ` 0/${isTargetSelling}`}
               </p>
-            </p>
-            <button className='mt-3 w-1/2 rounded-md bg-primaryColor py-2 text-white'>Đặt lại mục tiêu</button>
+            </div>
+            <Modal
+              onSubmit={onSubmit}
+              title='Mục tiêu'
+              isOpenModal={isOpenModal}
+              handleClick={handleOpenModal}
+              setIsOpenModal={setIsOpenModal}
+              renderModal={
+                <form onSubmit={onSubmit} className='mb-4'>
+                  <Controller
+                    control={control}
+                    name='sellingTarget'
+                    render={({ field }) => (
+                      <InputNumber
+                        classNameError='my-2 text-xs text-primaryColor'
+                        value={field.value}
+                        ref={field.ref}
+                        errorMessage={errors.sellingTarget?.message}
+                        placeholder='Số lượng'
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                </form>
+              }
+            >
+              <button onClick={handleOpenModal} className='mt-3 w-1/2 rounded-md bg-primaryColor py-2 text-white'>
+                Đặt lại mục tiêu
+              </button>
+            </Modal>
           </div>
         </div>
         <div className='col-span-8'></div>

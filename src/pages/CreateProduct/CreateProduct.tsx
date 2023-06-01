@@ -12,7 +12,6 @@ import { AppContext } from 'src/Contexts/Contexts'
 import { toast } from 'react-toastify'
 import { useParams } from 'react-router-dom'
 import { getIdFromNameId } from 'src/utils/utils'
-import { Product } from 'src/types/product.type'
 
 export default function CreateProduct() {
   const { images, setImages } = useContext(AppContext)
